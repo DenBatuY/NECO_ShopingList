@@ -7,6 +7,7 @@ import kotlinx.coroutines.launch
 
 class MainViewModel(database:MainDataBase):ViewModel() {
     private val dao = database.getDao()
+
     val allNotes:LiveData<List<NoteItem>> =dao.getAllItem().asLiveData()
 
     fun insertNote(note:NoteItem):Job {
