@@ -1,10 +1,14 @@
 package com.batuy.neco_shopinglist.activities
 
 import android.content.Intent
+import android.graphics.Typeface
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.text.Spannable
+import android.text.style.StyleSpan
 import android.view.Menu
 import android.view.MenuItem
+import androidx.core.text.getSpans
 import com.batuy.neco_shopinglist.R
 import com.batuy.neco_shopinglist.databinding.ActivityNewNoteBinding
 import com.batuy.neco_shopinglist.entities.NoteItem
@@ -35,7 +39,7 @@ class NewNoteActivity : AppCompatActivity() {
     private fun getNote() {
         val sNote = intent.getSerializableExtra(NoteFragment.NEW_NOTE_KEY)
         if (sNote != null) {
-            note=sNote as NoteItem
+            note = sNote as NoteItem
             binding.edTitle.setText(note?.title)
             binding.edDescription.setText(note?.content)
         }
@@ -43,12 +47,36 @@ class NewNoteActivity : AppCompatActivity() {
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         if (item.itemId == R.id.id_save) {
-             setMainActResult()
+            setMainActResult()
 
         } else if (item.itemId == android.R.id.home) {
             finish()
+        } else if (item.itemId == R.id.id_bold) {
+            setBoldForSelectedText()
         }
         return super.onOptionsItemSelected(item)
+    }
+
+    private fun setBoldForSelectedText() {
+        val startPosition = binding.edDescription.selectionStart
+        val endPosition = binding.edDescription.selectionEnd
+        val styles =
+            binding.edDescription.text.getSpans(startPosition, endPosition, StyleSpan::class.java)
+        var boldStyle: StyleSpan? = null
+        if (styles.isNotEmpty()) {
+            binding.edDescription.text.removeSpan(styles[0])// убираем стили с выбраного текста
+        } else {
+            boldStyle = StyleSpan(Typeface.BOLD)
+        }
+
+        binding.edDescription.text.setSpan(
+            boldStyle,
+            startPosition,
+            endPosition,
+            Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
+        )
+        binding.edDescription.text.trim()
+        binding.edDescription.setSelection(startPosition)
     }
 
     private fun actionbarHome() {
@@ -58,13 +86,13 @@ class NewNoteActivity : AppCompatActivity() {
     }
 
     private fun setMainActResult() {
-        val tempNote:NoteItem?
+        val tempNote: NoteItem?
         val i = Intent()
-        var editState= "new"
-        if (note==null) tempNote=createNewNote()
+        var editState = "new"
+        if (note == null) tempNote = createNewNote()
         else {
             tempNote = updateNote()
-            editState="update"
+            editState = "update"
         }
         i.putExtra(NoteFragment.NEW_NOTE_KEY, tempNote)
         i.putExtra(NoteFragment.EDIT_STATE_KEY, editState)
@@ -82,8 +110,8 @@ class NewNoteActivity : AppCompatActivity() {
         )
     }
 
-    private fun updateNote():NoteItem? {
-       return note?.copy(
+    private fun updateNote(): NoteItem? {
+        return note?.copy(
             title = binding.edTitle.text.toString(),
             content = binding.edDescription.text.toString()
         )
