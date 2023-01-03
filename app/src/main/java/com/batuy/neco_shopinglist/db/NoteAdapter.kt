@@ -8,6 +8,7 @@ import androidx.recyclerview.widget.ListAdapter
 
 import androidx.recyclerview.widget.RecyclerView
 import com.batuy.neco_shopinglist.R
+import com.batuy.neco_shopinglist.utils.HTML_Manager
 import com.batuy.neco_shopinglist.databinding.NoteListItemBinding
 import com.batuy.neco_shopinglist.entities.NoteItem
 
@@ -17,7 +18,7 @@ class NoteAdapter(private val listener:Listener): ListAdapter<NoteItem, NoteAdap
         private val binding = NoteListItemBinding.bind(view)
         fun setData(note:NoteItem,listener:Listener){
             binding.tvTitle.text=note.title
-            binding.tvDescription.text=note.content
+            binding.tvDescription.text= HTML_Manager.getFromHtml(note.content).trim()
             binding.tvTime.text=note.time
             binding.btDelete.setOnClickListener { listener.deleteItem(note.id!!) }// Удаление елемента
             itemView.setOnClickListener { listener.onClickItem(note) }

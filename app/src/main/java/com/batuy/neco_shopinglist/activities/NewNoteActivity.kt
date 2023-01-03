@@ -1,18 +1,26 @@
 package com.batuy.neco_shopinglist.activities
 
+import android.annotation.SuppressLint
 import android.content.Intent
 import android.graphics.Typeface
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.text.Spannable
+import android.text.style.ForegroundColorSpan
 import android.text.style.StyleSpan
 import android.view.Menu
 import android.view.MenuItem
+import android.view.View
+import android.view.animation.Animation
+import android.view.animation.AnimationUtils
+import androidx.core.content.ContextCompat
 import androidx.core.text.getSpans
 import com.batuy.neco_shopinglist.R
+import com.batuy.neco_shopinglist.utils.HTML_Manager
 import com.batuy.neco_shopinglist.databinding.ActivityNewNoteBinding
 import com.batuy.neco_shopinglist.entities.NoteItem
 import com.batuy.neco_shopinglist.fragments.NoteFragment
+import com.batuy.neco_shopinglist.utils.MyOnTouchListener
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -28,7 +36,20 @@ class NewNoteActivity : AppCompatActivity() {
         setContentView(binding.root)
         actionbarHome()
         getNote()
+        init()
+        onClickColor()
 
+    }
+
+    private fun onClickColor()= with(binding){
+        imageButtonRed.setOnClickListener {  setColorForSelectedText(R.color.picker_red)}
+        imageButtonGreen.setOnClickListener { setColorForSelectedText(R.color.picker_green) }
+        imageButtonBlue.setOnClickListener { setColorForSelectedText(R.color.picker_blue) }
+    }
+
+    @SuppressLint("ClickableViewAccessibility")
+    private fun init(){
+        binding.TableLayoutColors.setOnTouchListener(MyOnTouchListener())
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
@@ -41,7 +62,7 @@ class NewNoteActivity : AppCompatActivity() {
         if (sNote != null) {
             note = sNote as NoteItem
             binding.edTitle.setText(note?.title)
-            binding.edDescription.setText(note?.content)
+            binding.edDescription.setText(HTML_Manager.getFromHtml(note?.content!!))
         }
     }
 
@@ -53,6 +74,12 @@ class NewNoteActivity : AppCompatActivity() {
             finish()
         } else if (item.itemId == R.id.id_bold) {
             setBoldForSelectedText()
+        } else if (item.itemId == R.id.id_color) {
+            if (binding.TableLayoutColors.isShown) {
+                closeColorPicker()
+            } else {
+                openColorPicker()
+            }
         }
         return super.onOptionsItemSelected(item)
     }
@@ -71,6 +98,26 @@ class NewNoteActivity : AppCompatActivity() {
 
         binding.edDescription.text.setSpan(
             boldStyle,
+            startPosition,
+            endPosition,
+            Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
+        )
+        binding.edDescription.text.trim()
+        binding.edDescription.setSelection(startPosition)
+    }
+
+
+    private fun setColorForSelectedText(colorId:Int) {
+        val startPosition = binding.edDescription.selectionStart
+        val endPosition = binding.edDescription.selectionEnd
+        val styles =
+            binding.edDescription.text.getSpans(startPosition, endPosition, ForegroundColorSpan::class.java)
+        if (styles.isNotEmpty()) {
+            binding.edDescription.text.removeSpan(styles[0])// убираем стили с выбраного текста
+        }
+
+        binding.edDescription.text.setSpan(
+            ForegroundColorSpan(ContextCompat.getColor(this@NewNoteActivity,colorId)),
             startPosition,
             endPosition,
             Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
@@ -104,7 +151,7 @@ class NewNoteActivity : AppCompatActivity() {
         return NoteItem(
             null,
             binding.edTitle.text.toString(),
-            binding.edDescription.text.toString(),
+            HTML_Manager.toHtml(binding.edDescription.text),
             getCurrentTime(),
             ""
         )
@@ -113,7 +160,7 @@ class NewNoteActivity : AppCompatActivity() {
     private fun updateNote(): NoteItem? {
         return note?.copy(
             title = binding.edTitle.text.toString(),
-            content = binding.edDescription.text.toString()
+            content = HTML_Manager.toHtml(binding.edDescription.text)
         )
     }
 
@@ -121,5 +168,29 @@ class NewNoteActivity : AppCompatActivity() {
         val formatter = SimpleDateFormat("hh:mm:ss-yyyy/MM/dd", Locale.getDefault())
         return formatter.format(Calendar.getInstance().time)
 
+    }
+
+    private fun openColorPicker() {
+        binding.TableLayoutColors.visibility = View.VISIBLE
+        val openAnimation = AnimationUtils.loadAnimation(this, R.anim.open_color_picker)
+        binding.TableLayoutColors.startAnimation(openAnimation)
+    }
+
+    private fun closeColorPicker() {
+        val openAnimation = AnimationUtils.loadAnimation(this, R.anim.close_color_picker)
+        openAnimation.setAnimationListener(object : Animation.AnimationListener {
+            override fun onAnimationStart(animation: Animation?) {
+
+            }
+
+            override fun onAnimationEnd(animation: Animation?) {
+                binding.TableLayoutColors.visibility = View.GONE
+            }
+
+            override fun onAnimationRepeat(animation: Animation?) {
+
+            }
+        })
+        binding.TableLayoutColors.startAnimation(openAnimation)
     }
 }
