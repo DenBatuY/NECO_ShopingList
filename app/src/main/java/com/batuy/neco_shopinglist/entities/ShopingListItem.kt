@@ -7,19 +7,19 @@ import androidx.room.PrimaryKey
 @Entity(tableName = "shop_list_item")
 data class ShopingListItem(
     @PrimaryKey(autoGenerate = true)
-    val id:Int?,
+    val id: Int?,
     @ColumnInfo(name = "name")
-    val name:String,
+    val name: String,
 
     @ColumnInfo(name = "itemInfo")
-    val itemInfo:String?,
+    val itemInfo: String?,
 
     @ColumnInfo(name = "itemChecked")
-    val itemChecked:Int=0,
+    val itemChecked: Boolean = false,
 
     @ColumnInfo(name = "listId")
-    val listId:Int,
+    val listId: Int,
 
     @ColumnInfo(name = "itemType")
-    val itemType:String="item"
+    val itemType: Int = 0
 )

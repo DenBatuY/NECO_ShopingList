@@ -3,7 +3,6 @@ package com.batuy.neco_shopinglist.activities
 import android.annotation.SuppressLint
 import android.content.Intent
 import android.graphics.Typeface
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.text.Spannable
 import android.text.style.ForegroundColorSpan
@@ -13,15 +12,15 @@ import android.view.MenuItem
 import android.view.View
 import android.view.animation.Animation
 import android.view.animation.AnimationUtils
+import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
-import androidx.core.text.getSpans
 import com.batuy.neco_shopinglist.R
-import com.batuy.neco_shopinglist.utils.HTML_Manager
 import com.batuy.neco_shopinglist.databinding.ActivityNewNoteBinding
 import com.batuy.neco_shopinglist.entities.NoteItem
 import com.batuy.neco_shopinglist.fragments.NoteFragment
+import com.batuy.neco_shopinglist.utils.HTML_Manager
 import com.batuy.neco_shopinglist.utils.MyOnTouchListener
-import java.text.SimpleDateFormat
+import com.batuy.neco_shopinglist.utils.TimeManager
 import java.util.*
 
 class NewNoteActivity : AppCompatActivity() {
@@ -152,7 +151,7 @@ class NewNoteActivity : AppCompatActivity() {
             null,
             binding.edTitle.text.toString(),
             HTML_Manager.toHtml(binding.edDescription.text),
-            getCurrentTime(),
+           TimeManager.getCurrentTime(),
             ""
         )
     }
@@ -164,11 +163,7 @@ class NewNoteActivity : AppCompatActivity() {
         )
     }
 
-    private fun getCurrentTime(): String {
-        val formatter = SimpleDateFormat("hh:mm:ss-yyyy/MM/dd", Locale.getDefault())
-        return formatter.format(Calendar.getInstance().time)
 
-    }
 
     private fun openColorPicker() {
         binding.TableLayoutColors.visibility = View.VISIBLE

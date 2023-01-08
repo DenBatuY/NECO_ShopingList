@@ -12,4 +12,5 @@
     <color name="picker_red">#E61111</color>
     <color name="picker_green">#2EB817</color>
     <color name="picker_blue">#1863BD</color>
+    <color name="grey">#606367</color>
 </resources>
