@@ -4,6 +4,7 @@
     <string name="notes">Notes</string>
     <string name="shop_list">Shop List</string>
     <string name="new_item">New Item</string>
+    <string name="update">Update</string>
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
 </resources>

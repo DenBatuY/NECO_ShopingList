@@ -7,9 +7,9 @@ import androidx.room.RoomDatabase
 import com.batuy.neco_shopinglist.entities.LibraryItem
 import com.batuy.neco_shopinglist.entities.NoteItem
 import com.batuy.neco_shopinglist.entities.ShopingListItem
-import com.batuy.neco_shopinglist.entities.ShopingListNames
+import com.batuy.neco_shopinglist.entities.ShopListNameItem
 
-@Database(entities = [LibraryItem::class,NoteItem::class,ShopingListItem::class,ShopingListNames::class], version = 1)
+@Database(entities = [LibraryItem::class,NoteItem::class,ShopingListItem::class,ShopListNameItem::class], version = 1)
 
 abstract class MainDataBase: RoomDatabase() {
     abstract fun getDao():Dao
