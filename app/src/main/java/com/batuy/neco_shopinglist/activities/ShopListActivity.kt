@@ -1,5 +1,6 @@
 package com.batuy.neco_shopinglist.activities
 
+import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.Menu
@@ -16,6 +17,7 @@ import com.batuy.neco_shopinglist.db.TrainingViewModel
 import com.batuy.neco_shopinglist.dialogs.EditListItemDialog
 import com.batuy.neco_shopinglist.entities.ShopListNameItem
 import com.batuy.neco_shopinglist.entities.ShopingListItem
+import com.batuy.neco_shopinglist.utils.ShareHelper
 
 class ShopListActivity : AppCompatActivity(), ShopListItemAdapter.Listener {
     //        private val mainViewModel: MainViewModel by viewModels() {
@@ -61,11 +63,30 @@ class ShopListActivity : AppCompatActivity(), ShopListItemAdapter.Listener {
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        if (item.itemId == R.id.save_item) addnewShopItem()
+        when (item.itemId) {
+            R.id.save_item -> addNewShopItem()
+            R.id.delete_list -> {
+                mainViewModel.deleteShopListName(shoppingListNameItem?.id!!, true)
+                finish()
+            }
+            R.id.clear_list -> {
+                mainViewModel.deleteShopListName(shoppingListNameItem?.id!!, false)
+            }
+            R.id.share_list -> {
+                startActivity(
+                    Intent.createChooser(
+                        ShareHelper.shareShopList(
+                            adapter?.currentList!!,
+                            shoppingListNameItem?.name!!
+                        ), "Shared by"
+                    )
+                )
+            }
+        }
         return super.onOptionsItemSelected(item)
     }
 
-    private fun addnewShopItem() {
+    private fun addNewShopItem() {
         if (edItem?.text.toString().isEmpty()) return
         else {
             val item =
@@ -85,8 +106,11 @@ class ShopListActivity : AppCompatActivity(), ShopListItemAdapter.Listener {
     private fun listItemObserver() {
         mainViewModel.getAllItemsFromList(shoppingListNameItem?.id!!).observe(this) {
             adapter?.submitList(it)
-            binding.tvEmpty.visibility=if (it.isEmpty()){View.VISIBLE}
-            else{View.GONE}
+            binding.tvEmpty.visibility = if (it.isEmpty()) {
+                View.VISIBLE
+            } else {
+                View.GONE
+            }
         }
     }
 
@@ -109,16 +133,16 @@ class ShopListActivity : AppCompatActivity(), ShopListItemAdapter.Listener {
         const val SHOP_LIST_NAME = "shop_list_name"
     }
 
-    override fun onClickItem(shopListItem: ShopingListItem,state:Int) {
-        when(state){
-            ShopListItemAdapter.CHECK_BOX->mainViewModel.updateShopListItem(shopListItem)
-            ShopListItemAdapter.EDIT->editListItem(shopListItem)
+    override fun onClickItem(shopListItem: ShopingListItem, state: Int) {
+        when (state) {
+            ShopListItemAdapter.CHECK_BOX -> mainViewModel.updateShopListItem(shopListItem)
+            ShopListItemAdapter.EDIT -> editListItem(shopListItem)
         }
 
     }
 
-    private fun editListItem(item:ShopingListItem){
-        EditListItemDialog.showDialog(this,item,object : EditListItemDialog.Listener{
+    private fun editListItem(item: ShopingListItem) {
+        EditListItemDialog.showDialog(this, item, object : EditListItemDialog.Listener {
             override fun onClick(item: ShopingListItem) {
                 mainViewModel.updateShopListItem(item)
             }
