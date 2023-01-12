@@ -217,4 +217,21 @@ class ShopListActivity : AppCompatActivity(), ShopListItemAdapter.Listener {
             }
         })
     }
+
+    private fun saveItemCount(){
+        var checkedCounter=0
+        adapter?.currentList?.forEach {
+            if (it.itemChecked)checkedCounter++
+        }
+        val tempShopListNameItem=shoppingListNameItem?.copy(
+            allItemCounter = adapter?.itemCount!!,
+            checkedItemCounter = checkedCounter
+        )
+        mainViewModel.updateShopListName(tempShopListNameItem!!)
+    }
+
+    override fun onBackPressed() {
+        saveItemCount()
+        super.onBackPressed()
+    }
 }
