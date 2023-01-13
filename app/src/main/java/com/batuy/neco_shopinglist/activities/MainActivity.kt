@@ -1,8 +1,10 @@
 package com.batuy.neco_shopinglist.activities
 
 import android.content.Intent
+import android.content.SharedPreferences
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
+import androidx.preference.PreferenceManager
 import com.batuy.neco_shopinglist.R
 import com.batuy.neco_shopinglist.databinding.ActivityMainBinding
 import com.batuy.neco_shopinglist.dialogs.NewListDialog
@@ -13,11 +15,19 @@ import com.batuy.neco_shopinglist.settings.SettingsActivity
 
 class MainActivity : AppCompatActivity(), NewListDialog.Listener {
     lateinit var binding: ActivityMainBinding
+    private var currentTheme=""
     private var currentMenuItemId = R.id.notes
+    private lateinit var defPref:SharedPreferences
     override fun onCreate(savedInstanceState: Bundle?) {
+
+        defPref=PreferenceManager.getDefaultSharedPreferences(this)
+        currentTheme=defPref.getString("theme_key","blue").toString()
+        setTheme(getSelectedTheme())
+
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
+
         FragmentManager.setFragment(ShopListNamesFragment.newInstance(), this)
         setBottomNavListener()
     }
@@ -51,5 +61,11 @@ class MainActivity : AppCompatActivity(), NewListDialog.Listener {
     override fun onResume() {
         super.onResume()
         binding.btNav.selectedItemId = currentMenuItemId
+        if (defPref.getString("theme_key","blue")!=currentTheme) recreate()
+    }
+    private fun getSelectedTheme():Int{
+        return if (defPref.getString("theme_key","blue")=="blue"){
+            R.style.Theme_NECO_ShoppingList
+        }else{R.style.Theme_NECO_ShoppingListGreen}
     }
 }
