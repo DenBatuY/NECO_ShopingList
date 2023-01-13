@@ -9,6 +9,7 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.batuy.neco_shopinglist.R
+import com.batuy.neco_shopinglist.databinding.ShopLibraryListItemBinding
 import com.batuy.neco_shopinglist.databinding.ShopListItemBinding
 import com.batuy.neco_shopinglist.entities.ShopingListItem
 
@@ -25,13 +26,29 @@ class ShopListItemAdapter(private val listener: Listener) :
             binding.checkBox.isChecked = shopListItem.itemChecked
             setPaintFlagAndColor(binding)
             binding.checkBox.setOnClickListener {
-                listener.onClickItem(shopListItem.copy(itemChecked = binding.checkBox.isChecked),
-                    CHECK_BOX)
+                listener.onClickItem(
+                    shopListItem.copy(itemChecked = binding.checkBox.isChecked),
+                    CHECK_BOX
+                )
             }
             binding.imEdit.setOnClickListener { listener.onClickItem(shopListItem, EDIT) }
         }
 
-        fun setLibraryData(shopListNameItem: ShopingListItem, listener: Listener) {}
+        fun setLibraryData(shopListItem: ShopingListItem, listener: Listener) {
+            val binding = ShopLibraryListItemBinding.bind(view)
+            binding.tvNameLibrary.text = shopListItem.name
+            binding.imEditLibrary.setOnClickListener {
+                listener.onClickItem(
+                    shopListItem,
+                    EDIT_LIBRARY
+                )
+            }
+            binding.imDeleteLibrary.setOnClickListener { listener.onClickItem(shopListItem,
+                DELETE_LIBRARY) }
+
+            itemView.setOnClickListener { listener.onClickItem(shopListItem, ADD_LIBRARY_ITEM) }
+
+        }
 
         private fun infoVisibility(shopListNameItem: ShopingListItem): Int {
             return if (shopListNameItem.itemInfo.isNullOrEmpty()) {
@@ -128,12 +145,15 @@ class ShopListItemAdapter(private val listener: Listener) :
     }
 
     interface Listener {
-        fun onClickItem(shopListItem: ShopingListItem, state:Int)
+        fun onClickItem(shopListItem: ShopingListItem, state: Int)
     }
 
-    companion object{
+    companion object {
         const val EDIT = 0
         const val CHECK_BOX = 1
+        const val EDIT_LIBRARY = 2
+        const val DELETE_LIBRARY = 3
+        const val ADD_LIBRARY_ITEM = 4
     }
 
 

@@ -3,6 +3,7 @@ package com.batuy.neco_shopinglist.dialogs
 import android.app.AlertDialog
 import android.content.Context
 import android.view.LayoutInflater
+import android.view.View
 import com.batuy.neco_shopinglist.R
 import com.batuy.neco_shopinglist.databinding.EditListItemDialogBinding
 import com.batuy.neco_shopinglist.databinding.NewListDialogBinding
@@ -16,6 +17,7 @@ object EditListItemDialog {
         builder.setView(binding.root)
         binding.edNameDialog.setText(item.name)
         binding.edInfoDialog.setText(item.itemInfo)
+        if (item.itemType==1) binding.edInfoDialog.visibility=View.GONE
         binding.bUpdateDialog.setOnClickListener {
             if (binding.edNameDialog.text.toString().isNotEmpty()){
                 val tvInfo = if (binding.edInfoDialog.text.toString().isEmpty()){null}
