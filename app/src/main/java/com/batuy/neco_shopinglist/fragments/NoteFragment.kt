@@ -2,6 +2,7 @@ package com.batuy.neco_shopinglist.fragments
 
 import android.app.Activity
 import android.content.Intent
+import android.content.SharedPreferences
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -11,7 +12,10 @@ import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.ViewModelProvider
+import androidx.preference.PreferenceManager
+import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.batuy.neco_shopinglist.activities.MainApp
 import com.batuy.neco_shopinglist.activities.NewNoteActivity
 import com.batuy.neco_shopinglist.databinding.FragmentNoteBinding
@@ -25,9 +29,9 @@ class NoteFragment : BaseFragment(), NoteAdapter.Listener {
     private lateinit var binding: FragmentNoteBinding
     private lateinit var adapter: NoteAdapter
     private lateinit var editLauncher: ActivityResultLauncher<Intent>
+    private lateinit var defPref: SharedPreferences
 
-    private lateinit var mainViewModel:TrainingViewModel
-
+    private lateinit var mainViewModel: TrainingViewModel
 
 
 //    private val mainViewModel: MainViewModel by activityViewModels() {
@@ -58,11 +62,20 @@ class NoteFragment : BaseFragment(), NoteAdapter.Listener {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        binding.rcView.layoutManager = LinearLayoutManager(activity)
-        adapter = NoteAdapter(this@NoteFragment)
+
+        defPref=PreferenceManager.getDefaultSharedPreferences(requireActivity())
+        binding.rcView.layoutManager = getLayoutManager()
+        adapter = NoteAdapter(this@NoteFragment,defPref)
         binding.rcView.adapter = adapter
 
         observer()
+    }
+
+    private fun getLayoutManager():RecyclerView.LayoutManager{
+        return when(defPref.getString("note_style_key","Linear")){
+            "Linear"->{LinearLayoutManager(activity)}
+            else -> {GridLayoutManager(activity,2)}
+        }
     }
 
     private fun observer() {
@@ -83,7 +96,7 @@ class NoteFragment : BaseFragment(), NoteAdapter.Listener {
     private fun onEditResult() {
         editLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
             if (it.resultCode == Activity.RESULT_OK) {
-               // Log.d("test", "intent: ${it.data?.getStringExtra(NEW_NOTE_KEY)}")
+                // Log.d("test", "intent: ${it.data?.getStringExtra(NEW_NOTE_KEY)}")
                 val editState = it.data?.getStringExtra(EDIT_STATE_KEY)
                 if (editState == "update") {
                     mainViewModel.updateNote(it.data?.getSerializableExtra(NEW_NOTE_KEY) as NoteItem)

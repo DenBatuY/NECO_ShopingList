@@ -2,6 +2,7 @@ package com.batuy.neco_shopinglist.activities
 
 import android.annotation.SuppressLint
 import android.content.Intent
+import android.content.SharedPreferences
 import android.graphics.Typeface
 import android.os.Bundle
 import android.text.Spannable
@@ -12,8 +13,10 @@ import android.view.MenuItem
 import android.view.View
 import android.view.animation.Animation
 import android.view.animation.AnimationUtils
+import android.widget.EditText
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
+import androidx.preference.PreferenceManager
 import com.batuy.neco_shopinglist.R
 import com.batuy.neco_shopinglist.databinding.ActivityNewNoteBinding
 import com.batuy.neco_shopinglist.entities.NoteItem
@@ -28,15 +31,18 @@ class NewNoteActivity : AppCompatActivity() {
     private lateinit var binding: ActivityNewNoteBinding
 
     private var note: NoteItem? = null
+    private var pref:SharedPreferences? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityNewNoteBinding.inflate(layoutInflater)
         setContentView(binding.root)
+        pref=PreferenceManager.getDefaultSharedPreferences(this)
         actionbarHome()
         getNote()
         init()
         onClickColor()
+        setTextSize()
 
     }
 
@@ -187,5 +193,14 @@ class NewNoteActivity : AppCompatActivity() {
             }
         })
         binding.TableLayoutColors.startAnimation(openAnimation)
+    }
+
+    private fun setTextSize()= with(binding){
+        edTitle.setTextSize(pref?.getString("title_size_key","16"))
+        edDescription.setTextSize(pref?.getString("content_size_key","14"))
+    }
+
+    private fun EditText.setTextSize(size:String?){
+        if (size!=null){this.textSize=size.toFloat()}
     }
 }
